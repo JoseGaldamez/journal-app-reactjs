@@ -42,7 +42,7 @@ export const Sidebar = ({ drawerWidth = 240 }) => {
                 <ListItemIcon>
                   <TurnedInNot />
                 </ListItemIcon>
-                <Grid contaienr>
+                <Grid container>
                   <ListItemText primary={text} />
                   <ListItemText
                     secondary={
