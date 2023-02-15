@@ -15,7 +15,7 @@ export const authSlice = createSlice({
       state.uid = payload.uid;
       state.email = payload.email;
       state.displayName = payload.displayName;
-      state.photoURL = payload.photoURL;
+      state.photoURL = payload.photoURL || null;
       state.errorMessage = null;
     },
     logout: (state, { payload }) => {
