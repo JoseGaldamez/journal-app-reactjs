@@ -1,32 +1,65 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 // Material UI
 import { Google } from "@mui/icons-material";
-import { Button, Grid, Link, TextField, Typography } from "@mui/material";
+import {
+  Alert,
+  Button,
+  Grid,
+  Link,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 
 // Actions
-import { checkingAuthentication, startGoogleSignIn } from "../../store/auth";
+import {
+  startGoogleSignIn,
+  startLoginWithEmailAndPassword,
+} from "../../store/auth";
 // Hooks
 import { useForm } from "../../hooks";
 // Components
 import { AuthLayout } from "../layout/AuthLayout";
 import { useMemo } from "react";
 
+const validationForm = {
+  email: [(value) => value.includes("@"), "El formato del email es invalido"],
+  password: [
+    (value) => value.length >= 6,
+    "La contraseña debe tener al menos 6 caracteres",
+  ],
+};
+
 export const LoginPage = () => {
   const dispatch = useDispatch();
-  const { status } = useSelector((state) => state.auth);
+  const { status, errorMessage } = useSelector((state) => state.auth);
 
-  const { email, password, onInputChange } = useForm({
-    email: "josegaldamez@gmail.com",
-    password: "123456",
-  });
+  const [isFormSubmited, setIsFormSubmited] = useState(false);
+
+  const {
+    email,
+    password,
+    onInputChange,
+    emailValid,
+    passwordValid,
+    isFormValid,
+  } = useForm(
+    {
+      email: "",
+      password: "",
+    },
+    validationForm
+  );
 
   const isAuthenticating = useMemo(() => status === "checking", [status]);
 
   const handlerSubmit = (e) => {
     e.preventDefault();
-    dispatch(checkingAuthentication({ email, password }));
+
+    setIsFormSubmited(true);
+    if (!isFormValid) return;
+    dispatch(startLoginWithEmailAndPassword({ email, password }));
   };
 
   const handlerGoogleSubmit = () => {
@@ -47,6 +80,8 @@ export const LoginPage = () => {
               type="email"
               placeholder="correo@google.com"
               fullWidth
+              error={!!emailValid && isFormSubmited}
+              helperText={isFormSubmited ? emailValid : null}
             />
           </Grid>
           <Grid item xs={12} sx={{ mt: 2 }}>
@@ -58,9 +93,19 @@ export const LoginPage = () => {
               type="password"
               placeholder="Contraseña"
               fullWidth
+              error={!!passwordValid && isFormSubmited}
+              helperText={isFormSubmited ? passwordValid : null}
             />
           </Grid>
           <Grid container sx={{ mb: 2, mt: 1 }} spacing={2}>
+            <Grid item xs={12}>
+              <Alert
+                severity="error"
+                sx={{ display: errorMessage ? "" : "none" }}
+              >
+                {errorMessage}
+              </Alert>
+            </Grid>
             <Grid item xs={12} md={6}>
               <Button
                 type="submit"

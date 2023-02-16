@@ -39,7 +39,6 @@ export const RegisterPage = () => {
 
   const [formSubmited, setFormSubmited] = useState(false);
   const {
-    formState,
     email,
     password,
     displayName,
